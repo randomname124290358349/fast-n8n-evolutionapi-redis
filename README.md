@@ -52,8 +52,8 @@ Tudo pronto para usar sem precisar configurar nada manualmente!
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/randomname124290358349/EvolutionN8n.git
-cd EvolutionN8n
+git clone https://github.com/randomname124290358349/fast-n8n-evolutionapi-redis.git
+cd fast-n8n-evolutionapi-redis
 ```
 
 ### 2. Configure as variáveis de ambiente
