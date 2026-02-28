@@ -58,25 +58,30 @@ cd fast-n8n-evolutionapi-redis
 
 ### 2. Configure as variáveis de ambiente
 
-Antes de subir os containers, edite o `docker-compose.yml` e altere os seguintes valores:
+Todas as credenciais ficam no arquivo `.env` na raiz do projeto. Edite-o antes de subir os containers:
 
-```yaml
-# PostgreSQL — escolha uma senha segura
-POSTGRES_PASSWORD: SuaSenhaSegura
+```env
+# PostgreSQL
+POSTGRES_USER=admin
+POSTGRES_PASSWORD=SuaSenhaSegura
+POSTGRES_DB=evolution_api_db
 
 # Evolution API — chave de autenticação da API
-AUTHENTICATION_API_KEY: SuaChaveSegura
+AUTHENTICATION_API_KEY=SuaChaveSegura
 
 # n8n — credenciais do administrador
-N8N_OWNER_EMAIL: seuemail@dominio.com
-N8N_OWNER_PASSWORD: "SuaSenhaSegura"
-
-# (Opcional) Se tiver um domínio, descomente e configure:
-# WEBHOOK_URL: https://seu-dominio.com/
-# N8N_EDITOR_BASE_URL: https://seu-dominio.com/
+N8N_OWNER_EMAIL=seuemail@dominio.com
+N8N_OWNER_PASSWORD=SuaSenhaSegura
 ```
 
-> **Atenção:** Use a **mesma senha** em `POSTGRES_PASSWORD` e em `DATABASE_CONNECTION_URI`, e a **mesma chave** em `AUTHENTICATION_API_KEY` e `EVOLUTION_API_KEY`.
+> **Dica:** Você só precisa editar o `.env` — o `docker-compose.yml` lê automaticamente as variáveis de lá e as propaga para todos os serviços.
+
+Se tiver um domínio, descomente e ajuste as linhas no `docker-compose.yml`:
+
+```yaml
+#WEBHOOK_URL: https://seu-dominio.com/
+#N8N_EDITOR_BASE_URL: https://seu-dominio.com/
+```
 
 ### 3. Suba os containers
 
