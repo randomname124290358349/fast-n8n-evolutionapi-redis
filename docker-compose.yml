@@ -147,9 +147,11 @@ services:
       EVOLUTION_API_KEY: ${AUTHENTICATION_API_KEY}
       REDIS_HOST: redis
       REDIS_PORT: "6379"
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
     volumes:
       - n8n_data:/home/node/.n8n
       - ./init-n8n.sh:/init-n8n.sh:ro
+      - ./agente_whatsapp.json:/agente_whatsapp.json:ro
     networks:
       - evolution-net
     entrypoint: ["sh", "/init-n8n.sh"]

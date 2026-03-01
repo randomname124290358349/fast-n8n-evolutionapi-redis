@@ -1,0 +1,1325 @@
+{
+  "name": "Agente Whatsapp",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5009bb7d-1c46-4999-9481-b4ea64148173",
+              "name": "body.data.message.base64",
+              "value": "={{ $json.data.base64 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6608,
+        368
+      ],
+      "id": "403f6804-0d60-4ab6-960c-cb755f8591e3",
+      "name": "Set - Dados da Imagem"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "body.data.message.base64",
+        "options": {
+          "mimeType": "audio/ogg"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -6432,
+        96
+      ],
+      "id": "6b1a4e99-ab55-4693-b050-a325e418c665",
+      "name": "Converter Base64 para Áudio"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1738190f-07dc-4294-9d26-63c1307097ed",
+              "name": "mensagemCliente",
+              "value": "={{ $if($('OpenAI - Transcrever Áudio').isExecuted, $('OpenAI - Transcrever Áudio').item.json.text, $if($json.content, $json.content, $('Webhook - Receber Mensagem').item.json.body.data.message.conversation)) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6032,
+        240
+      ],
+      "id": "2b43d7d5-690d-44b5-91f1-52f6061810fe",
+      "name": "Set - Mensagem do Cliente"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -6256,
+        96
+      ],
+      "id": "1b9010cd-a619-4e74-b546-2f617640cd88",
+      "name": "OpenAI - Transcrever Áudio",
+      "credentials": {
+        "openAiApi": {
+          "id": "2ckhdhCGpQ6pF26V",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook - Receber Mensagem').item.json.body.data.messageType }}",
+                    "rightValue": "audioMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "947ac0f6-127c-44d9-a2f8-3730292a51b2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6ec38ced-b791-4a21-8d3e-929aa2470686",
+                    "leftValue": "={{ $('Webhook - Receber Mensagem').item.json.body.data.messageType }}",
+                    "rightValue": "conversation",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Texto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "64992b8c-1aee-4bb2-9c8e-10871decb39f",
+                    "leftValue": "={{ $('Webhook - Receber Mensagem').item.json.body.data.messageType }}",
+                    "rightValue": "imageMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Imagem"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -7072,
+        224
+      ],
+      "id": "9a7c50e9-9da3-4f9b-a306-70e90e91048b",
+      "name": "Switch - Tipo de Mídia"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "11907b07-083e-4616-a78a-7cc765a64e35",
+              "name": "body.data.message.base64",
+              "value": "={{ $json.data.base64 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6608,
+        96
+      ],
+      "id": "86ac1d79-b4d0-4fa9-a9d1-54b35685a614",
+      "name": "Set - Dados do Áudio"
+    },
+    {
+      "parameters": {
+        "model": "gpt-5.1",
+        "options": {}
+      },
+      "id": "d40cd46c-3724-4f46-ac92-5b535f88b0d3",
+      "name": "OpenAI - Modelo LLM",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -3312,
+        288
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "2ckhdhCGpQ6pF26V",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook - Receber Mensagem').item.json.body.data.key.remoteJid }}",
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
+      "typeVersion": 1.5,
+      "position": [
+        -3216,
+        432
+      ],
+      "id": "542fe986-8cf3-4cac-acc4-dd4697dc6dda",
+      "name": "Redis - Memória do Chat",
+      "credentials": {
+        "redis": {
+          "id": "x2XymCzQNbuNM2F0",
+          "name": "Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "={{ $('Extrair Metadata da Mensagem').item.json.msgIntance }}",
+        "messageId": "={{ $('Extrair Metadata da Mensagem').item.json.msgId }}"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6784,
+        96
+      ],
+      "id": "85d34e14-4e7f-4559-a4be-66f3b2953d8f",
+      "name": "Evolution - Obter Áudio Base64",
+      "credentials": {
+        "evolutionApi": {
+          "id": "hDQN2JrpNKuCJ86H",
+          "name": "Evolution API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "get-media-base64",
+        "instanceName": "={{ $('Extrair Metadata da Mensagem').item.json.msgIntance }}",
+        "messageId": "={{ $('Extrair Metadata da Mensagem').item.json.msgId }}"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -6784,
+        368
+      ],
+      "id": "16d345b1-c3de-4484-a5c3-b1ce79342af6",
+      "name": "Evolution - Obter Imagem Base64",
+      "credentials": {
+        "evolutionApi": {
+          "id": "hDQN2JrpNKuCJ86H",
+          "name": "Evolution API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "=msgLock:{{ $('Webhook - Receber Mensagem').item.json.body.data.key.remoteJid }}",
+        "keyType": "string",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5840,
+        240
+      ],
+      "id": "45db1ab1-3ee5-42b4-aea7-eed5e3447a6d",
+      "name": "Redis - Verificar Lock",
+      "credentials": {
+        "redis": {
+          "id": "x2XymCzQNbuNM2F0",
+          "name": "Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "afb8b2a2-b9a4-490c-a148-dab96077eb1b",
+              "leftValue": "={{ $json.propertyName }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -5664,
+        240
+      ],
+      "id": "27b79584-9e78-43dd-b7b5-c275cbf45ebb",
+      "name": "IF - Sem Lock Ativo"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=msgTemp:{{ $('Webhook - Receber Mensagem').item.json.body.data.key.remoteJid }}",
+        "value": "={{ $('Set - Mensagem do Cliente').item.json.mensagemCliente }}",
+        "keyType": "sets"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5232,
+        48
+      ],
+      "id": "01bbfccb-777c-43c4-8063-6018242ad7dd",
+      "name": "Redis - Armazenar Mensagem",
+      "credentials": {
+        "redis": {
+          "id": "x2XymCzQNbuNM2F0",
+          "name": "Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "=msgTemp:{{ $('Webhook - Receber Mensagem').item.json.body.data.key.remoteJid }}",
+        "keyType": "sets",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -4224,
+        32
+      ],
+      "id": "b9b1e2b6-0319-42da-8078-51b58f3d3618",
+      "name": "Redis - Resgatar Mensagens",
+      "credentials": {
+        "redis": {
+          "id": "x2XymCzQNbuNM2F0",
+          "name": "Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = items[0].json;\n\n// Une as mensagens com \". \"\nconst mensagens = input.propertyName.join('[quebrar]');\n\n// Monta o prompt desejado\nconst prompt = `${mensagens}`;\n\n// Retorna o resultado\nreturn [{ json: { prompt } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4048,
+        32
+      ],
+      "id": "429ef044-9865-408f-ac0b-12e1018bcf9e",
+      "name": "Code - Concatenar Mensagens"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5989c65f-8836-4eaf-8d6a-439e85341b6d",
+              "name": "msgJuntada",
+              "value": "={{ $json.prompt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3856,
+        32
+      ],
+      "id": "24ea05e0-0839-497c-a336-78c16c6dfe9f",
+      "name": "Set - Mensagens Concatenadas"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "=msgLock:{{ $('Webhook - Receber Mensagem').item.json.body.data.key.remoteJid }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -3664,
+        32
+      ],
+      "id": "10d1e585-86ab-417d-ae95-eaf9ecf5228d",
+      "name": "Redis - Remover Lock",
+      "credentials": {
+        "redis": {
+          "id": "x2XymCzQNbuNM2F0",
+          "name": "Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=msgLock:{{ $('Webhook - Receber Mensagem').item.json.body.data.key.remoteJid }}",
+        "value": "true"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5424,
+        48
+      ],
+      "id": "addc7d8d-b5ce-4529-ae1f-892ede427f6b",
+      "name": "Redis - Criar Lock",
+      "credentials": {
+        "redis": {
+          "id": "x2XymCzQNbuNM2F0",
+          "name": "Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "=msgTemp:{{ $('Webhook - Receber Mensagem').item.json.body.data.key.remoteJid }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -3488,
+        32
+      ],
+      "id": "4c88ea97-3160-453d-8cef-7a212506b302",
+      "name": "Redis - Limpar Mensagens",
+      "credentials": {
+        "redis": {
+          "id": "x2XymCzQNbuNM2F0",
+          "name": "Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=msgTemp:{{ $('Webhook - Receber Mensagem').item.json.body.data.key.remoteJid }}",
+        "value": "={{ $('Set - Mensagem do Cliente').item.json.mensagemCliente }}",
+        "keyType": "sets"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5424,
+        256
+      ],
+      "id": "db69cbaa-8ef0-4ea7-aec8-815dd180a1b0",
+      "name": "Redis - Adicionar à Fila",
+      "credentials": {
+        "redis": {
+          "id": "x2XymCzQNbuNM2F0",
+          "name": "Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "read-messages",
+        "instanceName": "={{ $('Extrair Metadata da Mensagem').item.json.msgIntance }}",
+        "remoteJid": "={{ $('Webhook - Receber Mensagem').item.json.body.data.key.remoteJid }}",
+        "messageId": "={{ $('Extrair Metadata da Mensagem').item.json.msgId }}"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -5232,
+        256
+      ],
+      "id": "b47a89ca-1cc7-4963-8a3f-b56b0d460cad",
+      "name": "Evolution - Marcar como Lida",
+      "credentials": {
+        "evolutionApi": {
+          "id": "hDQN2JrpNKuCJ86H",
+          "name": "Evolution API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": "=13"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -4816,
+        48
+      ],
+      "id": "19a24399-1dbd-4bc2-a8a3-fccd4dd0d133",
+      "name": "Wait - Aguardar Novas Mensagens",
+      "webhookId": "4a72165c-6ea5-42a0-8f18-46a26e87b875"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "6ed6e641-bb76-4392-81fb-14fe9466e3e9",
+      "name": "Loop - Processar Mensagens",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 2,
+      "position": [
+        -2736,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "={{ $('Extrair Metadata da Mensagem').item.json.msgIntance }}",
+        "remoteJid": "={{ $('Webhook - Receber Mensagem').item.json.body.data.key.remoteJid }}",
+        "messageText": "={{ $('Set - Tempo de Digitação').item.json.output }}",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -1968,
+        16
+      ],
+      "id": "1cc4de5d-5722-4ca1-8ebc-8e3828a61329",
+      "name": "Evolution - Enviar Mensagem",
+      "credentials": {
+        "evolutionApi": {
+          "id": "hDQN2JrpNKuCJ86H",
+          "name": "Evolution API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": "={{ $('Set - Tempo de Digitação').item.json.tempoDeDigitacao }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -2160,
+        16
+      ],
+      "id": "7018b883-aacb-4b16-a180-7cc6c22ef167",
+      "name": "Wait - Tempo de Digitação",
+      "webhookId": "72756f2f-9251-47ac-92a5-f232bec72c04"
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "send-presence",
+        "instanceName": "={{ $('Extrair Metadata da Mensagem').item.json.msgIntance }}",
+        "remoteJid": "={{ $('Webhook - Receber Mensagem').item.json.body.data.key.remoteJid }}",
+        "delay": "={{ Math.ceil($json.tempoDeDigitacao) * 1000 }}"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -2336,
+        16
+      ],
+      "id": "98493fc5-edc2-4a55-bb67-6d9233b60f73",
+      "name": "Evolution - Simular Digitação",
+      "credentials": {
+        "evolutionApi": {
+          "id": "hDQN2JrpNKuCJ86H",
+          "name": "Evolution API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Set - Mensagens Concatenadas').item.json.msgJuntada }}",
+        "options": {
+          "systemMessage": "Você é um agente geral."
+        }
+      },
+      "id": "138166f4-265a-439c-bada-8c0c8bf5d2eb",
+      "name": "Agente IA",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        -3312,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp/receberMensagem",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -7728,
+        256
+      ],
+      "id": "bfd60730-7995-4205-858c-4b3bd76f50b6",
+      "name": "Webhook - Receber Mensagem",
+      "webhookId": "6aa67c9f-e0ca-46f9-9e20-d4775d2d9737"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "=msgTemp:{{ $('Webhook - Receber Mensagem').item.json.body.data.key.remoteJid }}",
+        "keyType": "sets",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5024,
+        48
+      ],
+      "id": "cb359a8a-38b4-4dde-8383-75148bfb09c9",
+      "name": "Redis - Contar Mensagens",
+      "credentials": {
+        "redis": {
+          "id": "x2XymCzQNbuNM2F0",
+          "name": "Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "key": "=msgTemp:{{ $('Webhook - Receber Mensagem').item.json.body.data.key.remoteJid }}",
+        "keyType": "sets",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -4624,
+        48
+      ],
+      "id": "ddea4eb5-5b5b-4763-807a-b86ef6c7bbce",
+      "name": "Redis - Recontar Mensagens",
+      "credentials": {
+        "redis": {
+          "id": "x2XymCzQNbuNM2F0",
+          "name": "Redis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "59715001-1a96-4fbe-be75-4430f18698d9",
+              "leftValue": "={{ $('Redis - Contar Mensagens').item.json.propertyName.length }}",
+              "rightValue": "={{ $('Redis - Recontar Mensagens').item.json.propertyName.length }}",
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -4416,
+        48
+      ],
+      "id": "3ac484f0-2906-45af-9d92-76def0ba79bc",
+      "name": "IF - Nova Mensagem Recebida"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fb12848d-52c4-4bb0-a504-1aecc17bdc04",
+              "name": "msgId",
+              "value": "={{ $json.body.data.key.id }}",
+              "type": "string"
+            },
+            {
+              "id": "e76c89e2-c895-428a-9a7c-20891583f140",
+              "name": "msgType",
+              "value": "={{ $json.body.data.messageType }}",
+              "type": "string"
+            },
+            {
+              "id": "66fa098a-4f7b-4984-a2a2-a71c77ce9523",
+              "name": "msgIntance",
+              "value": "={{ $json.body.instance }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -7296,
+        240
+      ],
+      "id": "cc16a207-e7a7-4f4a-80e7-4be00f9b86ae",
+      "name": "Extrair Metadata da Mensagem"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2efb721f-8e5d-4e81-ba29-da507e5b1dfe",
+              "name": "tempoDeDigitacao",
+              "value": "={{ $json.output.length * 0.015 + Math.random() * 3 }}",
+              "type": "string"
+            },
+            {
+              "id": "60488105-785d-4489-aaa1-5d39fc984750",
+              "name": "output",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2512,
+        16
+      ],
+      "id": "014d3ed8-9d53-4c30-9bdb-98eda71dc548",
+      "name": "Set - Tempo de Digitação"
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = [];\n\nfor (const item of items) {\n  const text = item.json.output || \"\";\n\n  // Normaliza quebras e marcadores parecidos\n  const normalizado = text\n    .replace(/\\[quebra\\]/gi, \"[quebrar]\")   // trata [quebra] como [quebrar]\n    .replace(/\\n+/g, \"[quebrar]\");          // transforma quebras de linha em divisores\n\n  // Divide pelos marcadores finais\n  const partes = normalizado\n    .split(\"[quebrar]\")\n    .map(p => p.trim())\n    .filter(p => p.length > 0);             // remove vazios\n\n  // Adiciona cada parte como item separado\n  for (const msg of partes) {\n    results.push({ json: { output: msg } });\n  }\n}\n\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2992,
+        32
+      ],
+      "id": "8e2f211b-f03d-4ce6-bfa8-f6f28a154686",
+      "name": "Code - Dividir Resposta"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4b3cc961-fead-467d-9fc2-e7fee5364632",
+              "leftValue": "={{ $json.body.data.key.fromMe }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -7552,
+        256
+      ],
+      "id": "9413123c-a9b5-4855-8973-364eb08fbbf6",
+      "name": "Filtrar Mensagens Próprias"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "text": "Descreva o que está na imagem, inclusive texto. Foque em realizar o OCR. No output comece sempre com: \"O cliente enviou uma imagem com a seguinte descrição: ...\"",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -6256,
+        368
+      ],
+      "id": "d81efba8-604b-4e4b-9fd0-b05ec64c1b9d",
+      "name": "OpenAI - Descrever Imagem",
+      "credentials": {
+        "openAiApi": {
+          "id": "2ckhdhCGpQ6pF26V",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "body.data.message.base64",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -6432,
+        368
+      ],
+      "id": "d5693c77-03f6-495b-b8d5-38b15efb1714",
+      "name": "Converter Base64 para Imagem"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Set - Dados da Imagem": {
+      "main": [
+        [
+          {
+            "node": "Converter Base64 para Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converter Base64 para Áudio": {
+      "main": [
+        [
+          {
+            "node": "OpenAI - Transcrever Áudio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set - Mensagem do Cliente": {
+      "main": [
+        [
+          {
+            "node": "Redis - Verificar Lock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch - Tipo de Mídia": {
+      "main": [
+        [
+          {
+            "node": "Evolution - Obter Áudio Base64",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set - Mensagem do Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Evolution - Obter Imagem Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set - Dados do Áudio": {
+      "main": [
+        [
+          {
+            "node": "Converter Base64 para Áudio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Modelo LLM": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente IA",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis - Memória do Chat": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agente IA",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution - Obter Áudio Base64": {
+      "main": [
+        [
+          {
+            "node": "Set - Dados do Áudio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution - Obter Imagem Base64": {
+      "main": [
+        [
+          {
+            "node": "Set - Dados da Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis - Verificar Lock": {
+      "main": [
+        [
+          {
+            "node": "IF - Sem Lock Ativo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Sem Lock Ativo": {
+      "main": [
+        [
+          {
+            "node": "Redis - Criar Lock",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Redis - Adicionar à Fila",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis - Armazenar Mensagem": {
+      "main": [
+        [
+          {
+            "node": "Redis - Contar Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis - Resgatar Mensagens": {
+      "main": [
+        [
+          {
+            "node": "Code - Concatenar Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Concatenar Mensagens": {
+      "main": [
+        [
+          {
+            "node": "Set - Mensagens Concatenadas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set - Mensagens Concatenadas": {
+      "main": [
+        [
+          {
+            "node": "Redis - Remover Lock",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis - Remover Lock": {
+      "main": [
+        [
+          {
+            "node": "Redis - Limpar Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis - Criar Lock": {
+      "main": [
+        [
+          {
+            "node": "Redis - Armazenar Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis - Limpar Mensagens": {
+      "main": [
+        [
+          {
+            "node": "Agente IA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis - Adicionar à Fila": {
+      "main": [
+        [
+          {
+            "node": "Evolution - Marcar como Lida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait - Aguardar Novas Mensagens": {
+      "main": [
+        [
+          {
+            "node": "Redis - Recontar Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop - Processar Mensagens": {
+      "main": [
+        [
+          {
+            "node": "Set - Tempo de Digitação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution - Enviar Mensagem": {
+      "main": [
+        [
+          {
+            "node": "Loop - Processar Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait - Tempo de Digitação": {
+      "main": [
+        [
+          {
+            "node": "Evolution - Enviar Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evolution - Simular Digitação": {
+      "main": [
+        [
+          {
+            "node": "Wait - Tempo de Digitação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Receber Mensagem": {
+      "main": [
+        [
+          {
+            "node": "Filtrar Mensagens Próprias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis - Contar Mensagens": {
+      "main": [
+        [
+          {
+            "node": "Wait - Aguardar Novas Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis - Recontar Mensagens": {
+      "main": [
+        [
+          {
+            "node": "IF - Nova Mensagem Recebida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Nova Mensagem Recebida": {
+      "main": [
+        [
+          {
+            "node": "Redis - Resgatar Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Redis - Contar Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extrair Metadata da Mensagem": {
+      "main": [
+        [
+          {
+            "node": "Switch - Tipo de Mídia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set - Tempo de Digitação": {
+      "main": [
+        [
+          {
+            "node": "Evolution - Simular Digitação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Dividir Resposta": {
+      "main": [
+        [
+          {
+            "node": "Loop - Processar Mensagens",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrar Mensagens Próprias": {
+      "main": [
+        [
+          {
+            "node": "Extrair Metadata da Mensagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Descrever Imagem": {
+      "main": [
+        [
+          {
+            "node": "Set - Mensagem do Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Converter Base64 para Imagem": {
+      "main": [
+        [
+          {
+            "node": "OpenAI - Descrever Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Transcrever Áudio": {
+      "main": [
+        [
+          {
+            "node": "Set - Mensagem do Cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente IA": {
+      "main": [
+        [
+          {
+            "node": "Code - Dividir Resposta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "49b45e6b-12f5-49ac-aff6-ee7c3ac44c25",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "36ed650b6dc6ea459807404626b9d705225124a2e77f681c6435619cd8a1e6c1"
+  },
+  "id": "KAs50irdtrzv4wIb",
+  "tags": []
+}
