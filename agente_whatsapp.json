@@ -3,29 +3,6 @@
   "nodes": [
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "5009bb7d-1c46-4999-9481-b4ea64148173",
-              "name": "body.data.message.base64",
-              "value": "={{ $json.data.base64 }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        -6608,
-        368
-      ],
-      "id": "403f6804-0d60-4ab6-960c-cb755f8591e3",
-      "name": "Set - Dados da Imagem"
-    },
-    {
-      "parameters": {
         "operation": "toBinary",
         "sourceProperty": "body.data.message.base64",
         "options": {
@@ -35,10 +12,10 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        -6432,
-        96
+        -3600,
+        0
       ],
-      "id": "6b1a4e99-ab55-4693-b050-a325e418c665",
+      "id": "b009470c-c535-4841-8c90-bf75a93bcd05",
       "name": "Converter Base64 para Áudio"
     },
     {
@@ -58,10 +35,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -6032,
-        240
+        -3520,
+        224
       ],
-      "id": "2b43d7d5-690d-44b5-91f1-52f6061810fe",
+      "id": "7211b0b5-af40-4e22-9e12-fa7dc3c893d2",
       "name": "Set - Mensagem do Cliente"
     },
     {
@@ -73,14 +50,14 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        -6256,
-        96
+        -3856,
+        0
       ],
-      "id": "1b9010cd-a619-4e74-b546-2f617640cd88",
+      "id": "60f8b5fe-1080-4125-819e-abe6bb22bbda",
       "name": "OpenAI - Transcrever Áudio",
       "credentials": {
         "openAiApi": {
-          "id": "2ckhdhCGpQ6pF26V",
+          "id": "MU6adeGic3RPMvdM",
           "name": "OpenAi account"
         }
       }
@@ -170,10 +147,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.3,
       "position": [
-        -7072,
-        224
+        -4688,
+        208
       ],
-      "id": "9a7c50e9-9da3-4f9b-a306-70e90e91048b",
+      "id": "7b3aaa9f-1442-4575-abc5-e22a9474d0d6",
       "name": "Switch - Tipo de Mídia"
     },
     {
@@ -193,28 +170,28 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -6608,
-        96
+        -4192,
+        224
       ],
-      "id": "86ac1d79-b4d0-4fa9-a9d1-54b35685a614",
-      "name": "Set - Dados do Áudio"
+      "id": "c77c0acc-d547-466d-961f-7d91c50d9e9a",
+      "name": "Set - Dados da Mídia"
     },
     {
       "parameters": {
         "model": "gpt-5.1",
         "options": {}
       },
-      "id": "d40cd46c-3724-4f46-ac92-5b535f88b0d3",
+      "id": "63e0f8ad-7a9b-4ece-bba4-99a02a23fe5b",
       "name": "OpenAI - Modelo LLM",
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1,
       "position": [
-        -3312,
-        288
+        -784,
+        272
       ],
       "credentials": {
         "openAiApi": {
-          "id": "2ckhdhCGpQ6pF26V",
+          "id": "MU6adeGic3RPMvdM",
           "name": "OpenAi account"
         }
       }
@@ -228,14 +205,14 @@
       "type": "@n8n/n8n-nodes-langchain.memoryRedisChat",
       "typeVersion": 1.5,
       "position": [
-        -3216,
-        432
+        -688,
+        416
       ],
-      "id": "542fe986-8cf3-4cac-acc4-dd4697dc6dda",
+      "id": "4b01b224-13eb-40fe-a37f-2c2b6760b9cc",
       "name": "Redis - Memória do Chat",
       "credentials": {
         "redis": {
-          "id": "x2XymCzQNbuNM2F0",
+          "id": "trFJWRaDpUKn5nf8",
           "name": "Redis"
         }
       }
@@ -250,36 +227,14 @@
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        -6784,
-        96
+        -4384,
+        224
       ],
-      "id": "85d34e14-4e7f-4559-a4be-66f3b2953d8f",
-      "name": "Evolution - Obter Áudio Base64",
+      "id": "64f83548-77d3-4209-8b21-ceec51288792",
+      "name": "Evolution - Obter Mídia Base64",
       "credentials": {
         "evolutionApi": {
-          "id": "hDQN2JrpNKuCJ86H",
-          "name": "Evolution API"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "resource": "chat-api",
-        "operation": "get-media-base64",
-        "instanceName": "={{ $('Extrair Metadata da Mensagem').item.json.msgIntance }}",
-        "messageId": "={{ $('Extrair Metadata da Mensagem').item.json.msgId }}"
-      },
-      "type": "n8n-nodes-evolution-api.evolutionApi",
-      "typeVersion": 1,
-      "position": [
-        -6784,
-        368
-      ],
-      "id": "16d345b1-c3de-4484-a5c3-b1ce79342af6",
-      "name": "Evolution - Obter Imagem Base64",
-      "credentials": {
-        "evolutionApi": {
-          "id": "hDQN2JrpNKuCJ86H",
+          "id": "oCZwvvYltMxJIzmA",
           "name": "Evolution API"
         }
       }
@@ -294,14 +249,14 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -5840,
-        240
+        -3328,
+        224
       ],
-      "id": "45db1ab1-3ee5-42b4-aea7-eed5e3447a6d",
+      "id": "0e4422f7-dad7-4aa8-a42a-30bd8f70f5f4",
       "name": "Redis - Verificar Lock",
       "credentials": {
         "redis": {
-          "id": "x2XymCzQNbuNM2F0",
+          "id": "trFJWRaDpUKn5nf8",
           "name": "Redis"
         }
       }
@@ -334,10 +289,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -5664,
-        240
+        -3152,
+        224
       ],
-      "id": "27b79584-9e78-43dd-b7b5-c275cbf45ebb",
+      "id": "a3c243c1-5858-4792-9f77-bc6f0be6f6bd",
       "name": "IF - Sem Lock Ativo"
     },
     {
@@ -350,14 +305,14 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -5232,
-        48
+        -2720,
+        32
       ],
-      "id": "01bbfccb-777c-43c4-8063-6018242ad7dd",
+      "id": "26c2361a-3df6-461b-a2f8-3514b0e34dab",
       "name": "Redis - Armazenar Mensagem",
       "credentials": {
         "redis": {
-          "id": "x2XymCzQNbuNM2F0",
+          "id": "trFJWRaDpUKn5nf8",
           "name": "Redis"
         }
       }
@@ -372,14 +327,14 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -4224,
-        32
+        -1504,
+        16
       ],
-      "id": "b9b1e2b6-0319-42da-8078-51b58f3d3618",
+      "id": "fbe5d2d1-bfd3-42fa-af5c-3ced73127753",
       "name": "Redis - Resgatar Mensagens",
       "credentials": {
         "redis": {
-          "id": "x2XymCzQNbuNM2F0",
+          "id": "trFJWRaDpUKn5nf8",
           "name": "Redis"
         }
       }
@@ -391,34 +346,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -4048,
-        32
+        -1328,
+        16
       ],
-      "id": "429ef044-9865-408f-ac0b-12e1018bcf9e",
+      "id": "916b1f71-b87d-4864-a637-9f60c2030bbe",
       "name": "Code - Concatenar Mensagens"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "5989c65f-8836-4eaf-8d6a-439e85341b6d",
-              "name": "msgJuntada",
-              "value": "={{ $json.prompt }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        -3856,
-        32
-      ],
-      "id": "24ea05e0-0839-497c-a336-78c16c6dfe9f",
-      "name": "Set - Mensagens Concatenadas"
     },
     {
       "parameters": {
@@ -428,14 +360,14 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -3664,
-        32
+        -1136,
+        16
       ],
-      "id": "10d1e585-86ab-417d-ae95-eaf9ecf5228d",
+      "id": "88100dbf-74fe-4395-bac5-e5e63b030561",
       "name": "Redis - Remover Lock",
       "credentials": {
         "redis": {
-          "id": "x2XymCzQNbuNM2F0",
+          "id": "trFJWRaDpUKn5nf8",
           "name": "Redis"
         }
       }
@@ -449,14 +381,14 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -5424,
-        48
+        -2928,
+        32
       ],
-      "id": "addc7d8d-b5ce-4529-ae1f-892ede427f6b",
+      "id": "f8af4e1b-465a-4be7-b8c7-10c60e459e5f",
       "name": "Redis - Criar Lock",
       "credentials": {
         "redis": {
-          "id": "x2XymCzQNbuNM2F0",
+          "id": "trFJWRaDpUKn5nf8",
           "name": "Redis"
         }
       }
@@ -469,14 +401,14 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -3488,
-        32
+        -960,
+        16
       ],
-      "id": "4c88ea97-3160-453d-8cef-7a212506b302",
+      "id": "fb3e5609-a5b9-484b-936b-f372c6913b49",
       "name": "Redis - Limpar Mensagens",
       "credentials": {
         "redis": {
-          "id": "x2XymCzQNbuNM2F0",
+          "id": "trFJWRaDpUKn5nf8",
           "name": "Redis"
         }
       }
@@ -491,14 +423,14 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -5424,
-        256
+        -2928,
+        240
       ],
-      "id": "db69cbaa-8ef0-4ea7-aec8-815dd180a1b0",
+      "id": "c463c896-591c-4554-9ff6-193c1cc815cc",
       "name": "Redis - Adicionar à Fila",
       "credentials": {
         "redis": {
-          "id": "x2XymCzQNbuNM2F0",
+          "id": "trFJWRaDpUKn5nf8",
           "name": "Redis"
         }
       }
@@ -514,14 +446,14 @@
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        -5232,
-        256
+        -2720,
+        240
       ],
-      "id": "b47a89ca-1cc7-4963-8a3f-b56b0d460cad",
+      "id": "5b44ef35-9b19-406c-b28f-7ba163cc88e5",
       "name": "Evolution - Marcar como Lida",
       "credentials": {
         "evolutionApi": {
-          "id": "hDQN2JrpNKuCJ86H",
+          "id": "oCZwvvYltMxJIzmA",
           "name": "Evolution API"
         }
       }
@@ -533,10 +465,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -4816,
-        48
+        -2304,
+        32
       ],
-      "id": "19a24399-1dbd-4bc2-a8a3-fccd4dd0d133",
+      "id": "7fc529d5-0429-4156-9882-e0c6de7ab54b",
       "name": "Wait - Aguardar Novas Mensagens",
       "webhookId": "4a72165c-6ea5-42a0-8f18-46a26e87b875"
     },
@@ -547,13 +479,13 @@
           "reset": false
         }
       },
-      "id": "6ed6e641-bb76-4392-81fb-14fe9466e3e9",
+      "id": "3f6f440a-069e-4afd-b592-23f7c4329148",
       "name": "Loop - Processar Mensagens",
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 2,
       "position": [
-        -2736,
-        32
+        -208,
+        16
       ]
     },
     {
@@ -567,14 +499,14 @@
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        -1968,
-        16
+        560,
+        0
       ],
-      "id": "1cc4de5d-5722-4ca1-8ebc-8e3828a61329",
+      "id": "1dd06bc9-0922-450c-8b57-255b6c325779",
       "name": "Evolution - Enviar Mensagem",
       "credentials": {
         "evolutionApi": {
-          "id": "hDQN2JrpNKuCJ86H",
+          "id": "oCZwvvYltMxJIzmA",
           "name": "Evolution API"
         }
       }
@@ -586,10 +518,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -2160,
-        16
+        368,
+        0
       ],
-      "id": "7018b883-aacb-4b16-a180-7cc6c22ef167",
+      "id": "e05ba3cd-bf9a-4eae-b851-09b8906b29cd",
       "name": "Wait - Tempo de Digitação",
       "webhookId": "72756f2f-9251-47ac-92a5-f232bec72c04"
     },
@@ -604,14 +536,14 @@
       "type": "n8n-nodes-evolution-api.evolutionApi",
       "typeVersion": 1,
       "position": [
-        -2336,
-        16
+        192,
+        0
       ],
-      "id": "98493fc5-edc2-4a55-bb67-6d9233b60f73",
+      "id": "092a3166-b7f6-4321-908c-ef465f10d6ba",
       "name": "Evolution - Simular Digitação",
       "credentials": {
         "evolutionApi": {
-          "id": "hDQN2JrpNKuCJ86H",
+          "id": "oCZwvvYltMxJIzmA",
           "name": "Evolution API"
         }
       }
@@ -619,18 +551,18 @@
     {
       "parameters": {
         "promptType": "define",
-        "text": "={{ $('Set - Mensagens Concatenadas').item.json.msgJuntada }}",
+        "text": "={{ $('Code - Concatenar Mensagens').item.json.prompt }}",
         "options": {
           "systemMessage": "Você é um agente geral."
         }
       },
-      "id": "138166f4-265a-439c-bada-8c0c8bf5d2eb",
+      "id": "9ad92faf-ebaf-4e87-b2c2-30aa591c7103",
       "name": "Agente IA",
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
       "position": [
-        -3312,
-        32
+        -784,
+        16
       ]
     },
     {
@@ -642,10 +574,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -7728,
-        256
+        -5328,
+        240
       ],
-      "id": "bfd60730-7995-4205-858c-4b3bd76f50b6",
+      "id": "57a1fadc-8365-4394-b257-84d4510c5985",
       "name": "Webhook - Receber Mensagem",
       "webhookId": "6aa67c9f-e0ca-46f9-9e20-d4775d2d9737"
     },
@@ -659,14 +591,14 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -5024,
-        48
+        -2512,
+        32
       ],
-      "id": "cb359a8a-38b4-4dde-8383-75148bfb09c9",
+      "id": "763c0f9f-6e87-4b32-be65-c446fb35f4f5",
       "name": "Redis - Contar Mensagens",
       "credentials": {
         "redis": {
-          "id": "x2XymCzQNbuNM2F0",
+          "id": "trFJWRaDpUKn5nf8",
           "name": "Redis"
         }
       }
@@ -681,14 +613,14 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -4624,
-        48
+        -2112,
+        32
       ],
-      "id": "ddea4eb5-5b5b-4763-807a-b86ef6c7bbce",
+      "id": "9ee148d2-7367-4f09-b8e6-04e54490ee35",
       "name": "Redis - Recontar Mensagens",
       "credentials": {
         "redis": {
-          "id": "x2XymCzQNbuNM2F0",
+          "id": "trFJWRaDpUKn5nf8",
           "name": "Redis"
         }
       }
@@ -720,10 +652,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -4416,
-        48
+        -1696,
+        32
       ],
-      "id": "3ac484f0-2906-45af-9d92-76def0ba79bc",
+      "id": "f8d53b17-f929-429e-92ff-71ff47b82fbd",
       "name": "IF - Nova Mensagem Recebida"
     },
     {
@@ -755,10 +687,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -7296,
-        240
+        -4912,
+        224
       ],
-      "id": "cc16a207-e7a7-4f4a-80e7-4be00f9b86ae",
+      "id": "b23a98e9-a588-45bd-94ba-56dd6a6fcd0a",
       "name": "Extrair Metadata da Mensagem"
     },
     {
@@ -784,10 +716,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -2512,
-        16
+        16,
+        0
       ],
-      "id": "014d3ed8-9d53-4c30-9bdb-98eda71dc548",
+      "id": "727e8dc1-b310-4c11-a24d-8e0ed135c893",
       "name": "Set - Tempo de Digitação"
     },
     {
@@ -797,10 +729,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2992,
-        32
+        -464,
+        16
       ],
-      "id": "8e2f211b-f03d-4ce6-bfa8-f6f28a154686",
+      "id": "a4baab5c-2251-4fd4-833b-f32ab6c0a264",
       "name": "Code - Dividir Resposta"
     },
     {
@@ -831,10 +763,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -7552,
-        256
+        -5136,
+        240
       ],
-      "id": "9413123c-a9b5-4855-8973-364eb08fbbf6",
+      "id": "cca055e7-d348-412c-b4c0-0847b76298c9",
       "name": "Filtrar Mensagens Próprias"
     },
     {
@@ -854,14 +786,14 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
       "position": [
-        -6256,
-        368
+        -3872,
+        384
       ],
-      "id": "d81efba8-604b-4e4b-9fd0-b05ec64c1b9d",
+      "id": "e64231fd-66c6-4558-9a90-9e55a0e4a243",
       "name": "OpenAI - Descrever Imagem",
       "credentials": {
         "openAiApi": {
-          "id": "2ckhdhCGpQ6pF26V",
+          "id": "MU6adeGic3RPMvdM",
           "name": "OpenAi account"
         }
       }
@@ -875,26 +807,103 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        -6432,
-        368
+        -3600,
+        384
       ],
-      "id": "d5693c77-03f6-495b-b8d5-38b15efb1714",
+      "id": "da285499-2cf0-4a7a-998a-e3bcc5254778",
       "name": "Converter Base64 para Imagem"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook - Receber Mensagem').item.json.body.data.messageType }}",
+                    "rightValue": "audioMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a1b2c3d4-0001-0001-0001-000000000001"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook - Receber Mensagem').item.json.body.data.messageType }}",
+                    "rightValue": "imageMessage",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a1b2c3d4-0002-0002-0002-000000000002"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Imagem"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -3984,
+        224
+      ],
+      "id": "6c21107e-3a90-40df-bfdf-0a6790a91a3b",
+      "name": "Switch - Processar Mídia"
+    },
+    {
+      "parameters": {
+        "resource": "chat-api",
+        "operation": "read-messages",
+        "instanceName": "={{ $('Extrair Metadata da Mensagem').item.json.msgIntance }}",
+        "remoteJid": "={{ $('Webhook - Receber Mensagem').item.json.body.data.key.remoteJid }}",
+        "messageId": "={{ $('Extrair Metadata da Mensagem').item.json.msgId }}"
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        -1904,
+        32
+      ],
+      "id": "4dbbabec-8b37-4691-91a5-0361cda23a7e",
+      "name": "Marcar mensagens como lidas",
+      "credentials": {
+        "evolutionApi": {
+          "id": "oCZwvvYltMxJIzmA",
+          "name": "Evolution API"
+        }
+      }
     }
   ],
   "pinData": {},
   "connections": {
-    "Set - Dados da Imagem": {
-      "main": [
-        [
-          {
-            "node": "Converter Base64 para Imagem",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Converter Base64 para Áudio": {
       "main": [
         [
@@ -921,7 +930,7 @@
       "main": [
         [
           {
-            "node": "Evolution - Obter Áudio Base64",
+            "node": "Evolution - Obter Mídia Base64",
             "type": "main",
             "index": 0
           }
@@ -935,18 +944,7 @@
         ],
         [
           {
-            "node": "Evolution - Obter Imagem Base64",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Set - Dados do Áudio": {
-      "main": [
-        [
-          {
-            "node": "Converter Base64 para Áudio",
+            "node": "Evolution - Obter Mídia Base64",
             "type": "main",
             "index": 0
           }
@@ -970,28 +968,6 @@
           {
             "node": "Agente IA",
             "type": "ai_memory",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Evolution - Obter Áudio Base64": {
-      "main": [
-        [
-          {
-            "node": "Set - Dados do Áudio",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Evolution - Obter Imagem Base64": {
-      "main": [
-        [
-          {
-            "node": "Set - Dados da Imagem",
-            "type": "main",
             "index": 0
           }
         ]
@@ -1049,17 +1025,6 @@
       ]
     },
     "Code - Concatenar Mensagens": {
-      "main": [
-        [
-          {
-            "node": "Set - Mensagens Concatenadas",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Set - Mensagens Concatenadas": {
       "main": [
         [
           {
@@ -1195,7 +1160,7 @@
       "main": [
         [
           {
-            "node": "IF - Nova Mensagem Recebida",
+            "node": "Marcar mensagens como lidas",
             "type": "main",
             "index": 0
           }
@@ -1307,6 +1272,57 @@
           }
         ]
       ]
+    },
+    "Evolution - Obter Mídia Base64": {
+      "main": [
+        [
+          {
+            "node": "Set - Dados da Mídia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set - Dados da Mídia": {
+      "main": [
+        [
+          {
+            "node": "Switch - Processar Mídia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch - Processar Mídia": {
+      "main": [
+        [
+          {
+            "node": "Converter Base64 para Áudio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Converter Base64 para Imagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Marcar mensagens como lidas": {
+      "main": [
+        [
+          {
+            "node": "IF - Nova Mensagem Recebida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -1315,11 +1331,11 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "49b45e6b-12f5-49ac-aff6-ee7c3ac44c25",
+  "versionId": "1e43d494-b8e7-4a05-8cba-4cafcae31334",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "36ed650b6dc6ea459807404626b9d705225124a2e77f681c6435619cd8a1e6c1"
+    "instanceId": "edafa2939ef0d24834277c16d71b3d17bd70d4d94250d31dd30f96ec6fdb6a85"
   },
-  "id": "KAs50irdtrzv4wIb",
+  "id": "0eiKDrSz7imYfhw3",
   "tags": []
 }

@@ -274,9 +274,9 @@ async function importWorkflow(cookie, evolCredId, openAiCredId, redisCredId) {
   try {
     let workflowJson = fs.readFileSync('/agente_whatsapp.json', 'utf8');
     workflowJson = workflowJson
-      .replace(/hDQN2JrpNKuCJ86H/g, evolCredId)
-      .replace(/2ckhdhCGpQ6pF26V/g, openAiCredId)
-      .replace(/x2XymCzQNbuNM2F0/g, redisCredId);
+      .replace(/oCZwvvYltMxJIzmA/g, evolCredId)
+      .replace(/MU6adeGic3RPMvdM/g, openAiCredId)
+      .replace(/trFJWRaDpUKn5nf8/g, redisCredId);
     const workflow = JSON.parse(workflowJson);
     delete workflow.id;
     delete workflow.meta;

@@ -53,9 +53,9 @@ Esses IDs são substituídos automaticamente pelo `init-n8n.sh` pelos IDs reais 
 
 | Tipo | ID original |
 |---|---|
-| `evolutionApi` | `hDQN2JrpNKuCJ86H` |
-| `openAiApi` | `2ckhdhCGpQ6pF26V` |
-| `redis` | `x2XymCzQNbuNM2F0` |
+| `evolutionApi` | `oCZwvvYltMxJIzmA` |
+| `openAiApi` | `MU6adeGic3RPMvdM` |
+| `redis` | `trFJWRaDpUKn5nf8` |
 
 ---
 
