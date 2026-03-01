@@ -77,8 +77,9 @@ function httpRequest(method, path, data, cookie) {
   });
 }
 
-const get  = (path) => httpRequest('GET',  path, null, null);
-const post = (path, data, cookie) => httpRequest('POST', path, data, cookie);
+const get   = (path) => httpRequest('GET',   path, null, null);
+const post  = (path, data, cookie) => httpRequest('POST',  path, data, cookie);
+const patch = (path, data, cookie) => httpRequest('PATCH', path, data, cookie);
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 function extractAuthCookie(cookies) {
@@ -163,6 +164,142 @@ async function login() {
   return null;
 }
 
+/* ---------- Evolution API helpers ---------- */
+function evoRequest(method, path, data) {
+  return new Promise((resolve, reject) => {
+    const EVOLUTION_HOST = process.env.EVOLUTION_API_URL.replace(/^https?:\/\//, '').split(':')[0];
+    const EVOLUTION_PORT = parseInt(process.env.EVOLUTION_API_URL.replace(/^https?:\/\/[^:]+:?/, '') || '9090', 10);
+    const body = data ? JSON.stringify(data) : '';
+    const headers = {
+      'Content-Type': 'application/json',
+      'apikey': process.env.EVOLUTION_API_KEY,
+    };
+    if (body) headers['Content-Length'] = Buffer.byteLength(body);
+
+    const req = http.request(
+      { hostname: EVOLUTION_HOST, port: EVOLUTION_PORT, path, method, headers },
+      (res) => {
+        let buf = '';
+        res.on('data', c => buf += c);
+        res.on('end', () => resolve({ status: res.statusCode, body: buf }));
+      }
+    );
+    req.on('error', reject);
+    if (body) req.write(body);
+    req.end();
+  });
+}
+
+/* ---------- Aguarda Evolution API ficar pronta ---------- */
+async function waitForEvolution() {
+  for (let i = 1; i <= 30; i++) {
+    try {
+      const res = await evoRequest('GET', '/instance/fetchInstances', null);
+      if (res.status === 200) {
+        console.log('[init] Evolution API está pronta!');
+        return true;
+      }
+    } catch (e) { /* retry */ }
+    console.log('[init] Aguardando Evolution API... tentativa ' + i);
+    await sleep(3000);
+  }
+  return false;
+}
+
+/* ---------- Cria instância evo_n8n se não existir ---------- */
+async function setupEvolutionInstance() {
+  const INSTANCE_NAME = 'evo_n8n';
+
+  // Verificar se instância já existe
+  const listRes = await evoRequest('GET', '/instance/fetchInstances', null);
+  if (listRes.status === 200) {
+    const instances = JSON.parse(listRes.body);
+    const exists = instances.some(i => i.name === INSTANCE_NAME);
+    if (exists) {
+      console.log('[init] Instância ' + INSTANCE_NAME + ' já existe. Pulando criação.');
+      return;
+    }
+  }
+
+  console.log('[init] Criando instância ' + INSTANCE_NAME + '...');
+
+  // Criar instância
+  const createRes = await evoRequest('POST', '/instance/create', {
+    instanceName: INSTANCE_NAME,
+    integration: 'WHATSAPP-BAILEYS',
+    qrcode: true,
+  });
+  console.log('[init] Criar instância → HTTP ' + createRes.status + ' ' + createRes.body.substring(0, 200));
+
+  if (createRes.status !== 201 && createRes.status !== 200) {
+    console.log('[init] AVISO: Falha ao criar instância. Pulando configuração do webhook.');
+    return;
+  }
+
+  await sleep(2000);
+
+  // Configurar settings da instância
+  const settingsRes = await evoRequest('POST', '/settings/set/' + INSTANCE_NAME, {
+    rejectCall: false,
+    msgCall: '',
+    groupsIgnore: false,
+    alwaysOnline: false,
+    readMessages: false,
+    readStatus: false,
+    syncFullHistory: false,
+  });
+  console.log('[init] Settings → HTTP ' + settingsRes.status);
+
+  // Configurar webhook
+  const webhookRes = await evoRequest('POST', '/webhook/set/' + INSTANCE_NAME, {
+    webhook: {
+      url: 'http://n8n:5678/webhook/whatsapp/receberMensagem',
+      enabled: true,
+      webhookByEvents: false,
+      base64: true,
+      events: ['MESSAGES_UPSERT'],
+    },
+  });
+  console.log('[init] Webhook → HTTP ' + webhookRes.status);
+
+  console.log('[init] ✔ Instância ' + INSTANCE_NAME + ' criada e configurada!');
+  console.log('[init] ────────────────────────────────────────────────────────');
+  console.log('[init]  AÇÃO NECESSÁRIA: Conecte o WhatsApp manualmente.');
+  console.log('[init]  Use o painel da Evolution API para escanear o QR Code.');
+  console.log('[init] ────────────────────────────────────────────────────────');
+}
+
+/* ---------- Importar e ativar workflow ---------- */
+async function importWorkflow(cookie, evolCredId, openAiCredId, redisCredId) {
+  try {
+    let workflowJson = fs.readFileSync('/agente_whatsapp.json', 'utf8');
+    workflowJson = workflowJson
+      .replace(/hDQN2JrpNKuCJ86H/g, evolCredId)
+      .replace(/2ckhdhCGpQ6pF26V/g, openAiCredId)
+      .replace(/x2XymCzQNbuNM2F0/g, redisCredId);
+    const workflow = JSON.parse(workflowJson);
+    delete workflow.id;
+    delete workflow.meta;
+    const res = await post('/rest/workflows', workflow, cookie);
+    console.log('[init] Importar workflow → HTTP ' + res.status + ' ' + res.body.substring(0, 300));
+    if (res.status === 200 || res.status === 201) {
+      const body = JSON.parse(res.body);
+      const workflow = body.data || body;
+      const workflowId = workflow.id;
+      const versionId = workflow.versionId;
+      const actRes = await post('/rest/workflows/' + workflowId + '/activate', { versionId }, cookie);
+      console.log('[init] Publicar workflow → HTTP ' + actRes.status + ' ' + actRes.body.substring(0, 200));
+      if (actRes.status === 200) {
+        console.log('[init] ✔ Workflow "Agente Whatsapp" importado e publicado!');
+      } else {
+        console.log('[init] AVISO: Workflow criado mas não foi publicado automaticamente. Publique manualmente no n8n.');
+      }
+    }
+  } catch (e) {
+    console.log('[init] AVISO: Não foi possível importar o workflow: ' + e.message);
+  }
+}
+
 /* ---------- main ---------- */
 async function main() {
   let cookie = null;
@@ -193,6 +330,20 @@ async function main() {
     },
   }, cookie);
   console.log('[init] Evolution API → HTTP ' + evolRes.status + ' ' + evolRes.body.substring(0, 200));
+  let evolCredId = null;
+  try { evolCredId = (JSON.parse(evolRes.body).data || JSON.parse(evolRes.body)).id; } catch(e) {}
+
+  // Criar credencial OpenAI
+  const openAiRes = await post('/rest/credentials', {
+    name: 'OpenAi account',
+    type: 'openAiApi',
+    data: {
+      apiKey: process.env.OPENAI_API_KEY,
+    },
+  }, cookie);
+  console.log('[init] OpenAI → HTTP ' + openAiRes.status + ' ' + openAiRes.body.substring(0, 200));
+  let openAiCredId = null;
+  try { openAiCredId = (JSON.parse(openAiRes.body).data || JSON.parse(openAiRes.body)).id; } catch(e) {}
 
   // Criar credencial Redis
   const redisRes = await post('/rest/credentials', {
@@ -205,10 +356,27 @@ async function main() {
     },
   }, cookie);
   console.log('[init] Redis → HTTP ' + redisRes.status + ' ' + redisRes.body.substring(0, 200));
+  let redisCredId = null;
+  try { redisCredId = (JSON.parse(redisRes.body).data || JSON.parse(redisRes.body)).id; } catch(e) {}
 
-  // Marcar como inicializado
+  // Marcar como inicializado (credenciais n8n)
   fs.writeFileSync(INIT_MARKER, new Date().toISOString() + '\n');
-  console.log('[init] Setup concluído com sucesso!');
+  console.log('[init] Setup n8n concluído com sucesso!');
+
+  // Importar workflow Agente Whatsapp
+  if (evolCredId && openAiCredId && redisCredId) {
+    await importWorkflow(cookie, evolCredId, openAiCredId, redisCredId);
+  } else {
+    console.log('[init] AVISO: IDs de credenciais não capturados. Importe o workflow manualmente.');
+  }
+
+  // Criar instância Evolution API
+  const evoReady = await waitForEvolution();
+  if (evoReady) {
+    await setupEvolutionInstance();
+  } else {
+    console.log('[init] AVISO: Evolution API não respondeu. Instância não foi criada.');
+  }
 }
 
 main().catch(e => {
